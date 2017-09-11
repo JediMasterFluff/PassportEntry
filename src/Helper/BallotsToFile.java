@@ -31,15 +31,15 @@ import Objects.Restaurant;
  */
 public class BallotsToFile {
 
-	private LinkedHashMap<Restaurant<String, Integer, Double>, Integer> map; // Map to hold all passed
-												// passport restaurant votes
+	private LinkedHashMap<Restaurant<String, Integer, Double>, Integer> map; // Map to hold all passed passport
+																				// restaurant votes
 
 	private static final String FILE_NAME = "/output/BalloutCounts_"
 			+ new SimpleDateFormat("dd_MM_yyyy").format(new Date()) + ".xlsx";
 	private File file;
 	private XSSFWorkbook workbook;
 
-	private int rowNum;
+	private int rowNum; // The running count of the number of rows entered into the current workbook
 
 	public BallotsToFile() {
 
@@ -47,6 +47,12 @@ public class BallotsToFile {
 		workbook = new XSSFWorkbook();
 	}
 
+	/**
+	 * Creates the working Passport Entry workbook for all the processing of the
+	 * current session.
+	 * 
+	 * The file will remain open until the finish() method is called.
+	 */
 	public void createFile() {
 
 		XSSFSheet passport_sheet = workbook.createSheet("Passport Counts");
@@ -99,7 +105,7 @@ public class BallotsToFile {
 	}
 
 	/**
-	 * Helper Method to enter a ballot entry into the file
+	 * Helper method to enter a ballot entry into the file
 	 * 
 	 * @param r
 	 *            the current row being inserted into
@@ -114,12 +120,13 @@ public class BallotsToFile {
 	}
 
 	/**
-	 * Pulls the vote map from a provided Passport and either adds a new entry
-	 * to the master map or appends their tallies to an existing entry
+	 * Pulls the vote map from a an already given Passport and either adds a new
+	 * entry to the master map or appends their tallies to an existing entry
 	 * 
 	 * @param votes
 	 *            The LinkedHashMap of votes from a Passport
 	 */
+	@SuppressWarnings("unused")
 	private void getResturantVotes(LinkedHashMap<Restaurant<String, Integer, Double>, Integer> votes) {
 		if (!votes.isEmpty()) {
 			Iterator<Entry<Restaurant<String, Integer, Double>, Integer>> it = votes.entrySet().iterator();
@@ -136,11 +143,14 @@ public class BallotsToFile {
 		}
 	}
 
+	/**
+	 * Call to finally close the passport entry workbook. Should only be called once
+	 * all processing has been completed.
+	 */
 	public void finish() {
 		try {
 			workbook.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

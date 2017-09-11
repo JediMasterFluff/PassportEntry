@@ -23,8 +23,6 @@ import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
-import org.apache.commons.collections4.iterators.IteratorEnumeration;
-
 import Objects.Passport;
 import Objects.Passport.Comment;
 import Objects.Restaurant;
@@ -33,29 +31,37 @@ import Screen.ToggleButtonPanel;
 public class PassportEntryHelper {
 
 	private static final int GAP = 5;
+	private static PassportEntryHelper instance = null;
 
-	private	Vector<Restaurant<String, Integer, Double>> MasterResList;
+	private Vector<Restaurant<String, Integer, Double>> MasterResList;
 	private Vector<Passport> MasterBallotList;
 	private Passport current_passport;
 	public int TOTAL_TALLY;
 
-	public PassportEntryHelper() {
+	protected PassportEntryHelper() {
 		TOTAL_TALLY = 0;
 		MasterResList = new Vector<Restaurant<String, Integer, Double>>();
 		MasterBallotList = new Vector<Passport>();
 		current_passport = new Passport();
+	}
+	
+	public static PassportEntryHelper getInstance() {
+		if(instance == null)
+			instance = new PassportEntryHelper();
+		
+		return instance;
 	}
 
 	private List<Color> colours = Arrays.asList(new Color(255, 202, 125), new Color(196, 215, 155),
 			new Color(146, 205, 220), new Color(177, 160, 199), new Color(255, 153, 204));
 
 	/**
-	 * Will create a String array of restaurant names provided by the user via a
-	 * CSV file
+	 * Will create a String array of restaurant names provided by the user via a CSV
+	 * file
 	 * 
 	 * @param f
-	 *            - a csv file given at the start of the application to be used
-	 *            to generate the toggle button grid
+	 *            - a CSV file given at the start of the application to be used to
+	 *            generate the toggle button grid
 	 * @return a new ArrayList of restaurant names
 	 */
 	public Map<String, Path> generateListFromFile(File f) {
@@ -83,8 +89,8 @@ public class PassportEntryHelper {
 
 	/**
 	 * Will create a grid of toggle buttons from provided list of participating
-	 * restaurants Places toggle buttons will be placed into the provided JFrame
-	 * and will be returned.
+	 * restaurants Places toggle buttons will be placed into the provided JFrame and
+	 * will be returned.
 	 * 
 	 * @param parent
 	 *            the JPanel to place the grid of toggle buttons
@@ -141,11 +147,12 @@ public class PassportEntryHelper {
 	}
 
 	/**
-	 * Once the Enter button is clicked, all information on the screen will be
-	 * saved to the current passport and that passport will then be placed into
-	 * the master list before creating a new passport
+	 * All information entered on the screen will be saved to the current passport
+	 * object and then will be placed into the master ballot list before creating a
+	 * new passport object
 	 * 
-	 * Every time a ballot is submitted, we will recalculate the voting percentage records
+	 * Every time a ballot is submitted, we will recalculate the voting percentage
+	 * records
 	 * 
 	 * @param age
 	 *            The age entered on the ballot
@@ -170,29 +177,29 @@ public class PassportEntryHelper {
 	}
 
 	/**
-	 * Will write the current contents of the MasterBallotList to a file, then
-	 * clear the list.
+	 * Will write the current contents of the MasterBallotList to a file, then clear
+	 * the list.
 	 */
 	public void submitCountedBallots() {
 
 	}
-	
-	public void addRestaurant(Restaurant<String, Integer, Double> r){
-		if(!MasterResList.contains(r))
+
+	public void addRestaurant(Restaurant<String, Integer, Double> r) {
+		if (!MasterResList.contains(r))
 			MasterResList.add(r);
 	}
-	
-	public boolean contains(String s){
-		for(Restaurant<String, Integer, Double> r : MasterResList){
-			if(r.getLeft() == s)
+
+	public boolean contains(String s) {
+		for (Restaurant<String, Integer, Double> r : MasterResList) {
+			if (r.getLeft() == s)
 				return true;
 		}
 		return false;
 	}
-	
-	public Restaurant<String, Integer, Double> getRestaurant(String name){
+
+	public Restaurant<String, Integer, Double> getRestaurant(String name) {
 		Iterator<Restaurant<String, Integer, Double>> it = MasterResList.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			if (it.next().getLeft().equals(name))
 				return it.next();
 		}
@@ -202,10 +209,10 @@ public class PassportEntryHelper {
 	public int getMasterBallotSize() {
 		return MasterBallotList.size();
 	}
-	
-	public void updateRestaurant(Restaurant<String, Integer, Double> r){
-		for (Restaurant<String, Integer, Double> tmp : MasterResList){
-			if(tmp.getLeft().equals(r.getLeft())){
+
+	public void updateRestaurant(Restaurant<String, Integer, Double> r) {
+		for (Restaurant<String, Integer, Double> tmp : MasterResList) {
+			if (tmp.getLeft().equals(r.getLeft())) {
 				MasterResList.remove(tmp);
 				MasterResList.add(r);
 				return;

@@ -99,7 +99,7 @@ public class PassportEntryScreen extends JFrame {
 	 */
 	public PassportEntryScreen() {
 		getFile();
-		peh = new PassportEntryHelper();
+		peh = PassportEntryHelper.getInstance();
 		btf = new BallotsToFile();
 		btf.createFile();
 		initialize();
