@@ -41,6 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -99,7 +100,7 @@ public class PassportEntryScreen extends JFrame {
 	 */
 	public PassportEntryScreen() {
 		getFile();
-		peh = PassportEntryHelper.getInstance();
+		peh = PassportEntryHelper.getInstance();;
 		btf = new BallotsToFile();
 		btf.createFile();
 		initialize();
@@ -268,6 +269,11 @@ public class PassportEntryScreen extends JFrame {
 
 		foodie_combo = new JComboBox<>();
 		foodie_combo.addItem("No Location");
+		
+		for (Component c : participantPanel.getComponents()) {
+			foodie_combo.addItem(((JToggleButton) c).getText());
+		}
+		
 		SortedSet<String> res_names = new TreeSet<String>(tmp.keySet());
 		Iterator<String> it = res_names.iterator();
 		while (it.hasNext()) {
@@ -446,6 +452,6 @@ public class PassportEntryScreen extends JFrame {
 		postal_field.setText("");
 		gender_combo.setSelectedItem(Integer.valueOf(0));
 		foodie_combo.setSelectedItem(Integer.valueOf(0));
-		//set default toggleview
+		participantPanel.setToggles(peh.getMasterResList());
 	}
 }

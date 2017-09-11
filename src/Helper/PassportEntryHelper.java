@@ -171,14 +171,18 @@ public class PassportEntryHelper {
 		current_passport.setComments(comments);
 		current_passport.setFoodie(foodie);
 		current_passport.setGender(gender);
-
+		
 		MasterBallotList.addElement(current_passport);
+		
+		RecalculatePercentage();
 		current_passport = new Passport();
 	}
 
 	/**
 	 * Will write the current contents of the MasterBallotList to a file, then clear
 	 * the list.
+	 * 
+	 * Should only be called at the end of processing ballots. Cannot be undone
 	 */
 	public void submitCountedBallots() {
 
@@ -189,6 +193,11 @@ public class PassportEntryHelper {
 			MasterResList.add(r);
 	}
 
+	/**
+	 * Method to check the MasterResList if the given restaurant name is already is the list
+	 * @param s The name of the Restaurant to test
+	 * @return true if name is in the list. false if name is not in the list.
+	 */
 	public boolean contains(String s) {
 		for (Restaurant<String, Integer, Double> r : MasterResList) {
 			if (r.getLeft() == s)
@@ -197,6 +206,11 @@ public class PassportEntryHelper {
 		return false;
 	}
 
+	/**
+	 * Returns a Restaurant Object from a given name, if it exists
+	 * @param name The name of the restaurant to return
+	 * @return The restaurant object returned from the MasterReslist
+	 */
 	public Restaurant<String, Integer, Double> getRestaurant(String name) {
 		Iterator<Restaurant<String, Integer, Double>> it = MasterResList.iterator();
 		while (it.hasNext()) {
@@ -218,5 +232,21 @@ public class PassportEntryHelper {
 				return;
 			}
 		}
+	}
+	
+	
+	/**
+	 * Internal method called after every ballot has been entered.
+	 * 
+	 * Will recalculate every restaurant's voting percentage in the MasterResList
+	 */
+	private void RecalculatePercentage() {
+		for(Restaurant<String, Integer, Double> res : MasterResList) {
+			res.recalculatePercent(TOTAL_TALLY);
+		}
+	}
+
+	public Vector<Restaurant<String, Integer, Double>> getMasterResList() {
+		return MasterResList;
 	}
 }

@@ -43,7 +43,10 @@ public class Restaurant<L, M, R> extends Triple<String, Integer, Double> {
 	}
 	
 	public void recalculatePercent(int total){
-		this.percent = this.count / total;
+		if(total != 0)
+			this.percent = (double) Math.round(this.count * 100.0)  / total;
+		else
+			this.percent = 100.00;
 	}
 	
 }
