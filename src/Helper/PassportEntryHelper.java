@@ -214,7 +214,7 @@ public class PassportEntryHelper {
 	public Restaurant<String, Integer, Double> getRestaurant(String name) {
 		Iterator<Restaurant<String, Integer, Double>> it = MasterResList.iterator();
 		while (it.hasNext()) {
-			if (it.next().getLeft().equals(name))
+			if (contains(name))
 				return it.next();
 		}
 		return null;

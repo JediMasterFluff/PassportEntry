@@ -1,7 +1,6 @@
 package Screen;
 
 import java.awt.Component;
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -28,14 +27,15 @@ public class ToggleButtonPanel extends JPanel {
 		components = getComponents();		
 	}
 	
-	public String[] getComponents() {
-		String[] list = new String;
+	public String[] getComponentNames() {
+		String[] list = new String[this.components.length];
 		
-		for(Component c : this.components)
-		
-		list.
-		
-		return this.components;
+		for(int i = 1; i < this.components.length; i++) {
+			Component c = this.components[i];
+			list[i] = ((JToggleButton) c).getText();
+		}
+
+		return list;
 	}
 
 	public List<String> selectedToggles() {
@@ -52,11 +52,11 @@ public class ToggleButtonPanel extends JPanel {
 	}
 
 	public void setToggles(Vector<Restaurant<String, Integer, Double>> percentages){
-		for (int i = 0; i < components.length; i++){
+		for (int i = 1; i < components.length; i++){
 			P_Log log = P_Log.getLog();
-			log.writeLog("Component " + i, Level.INFO);
 			Component c = components[i];
-			for(int j = 0; j <= percentages.size(); j++) {
+			log.writeLog("Component " + i + " - " + ((JToggleButton) c).getText() , Level.INFO);
+			for(int j = 1; j < percentages.size(); j++) {
 				if(((JToggleButton) c).getText().equals(percentages.get(j).getLeft())) {
 					
 					Restaurant<String, Integer, Double> res = percentages.get(j);

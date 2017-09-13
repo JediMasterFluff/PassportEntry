@@ -18,12 +18,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -41,7 +38,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -180,11 +176,11 @@ public class PassportEntryScreen extends JFrame {
 
 		participantPanel = new ToggleButtonPanel();
 		participantPanel.setBackground(Color.WHITE);
-		frmTasteOfDowntown.getContentPane().add(participantPanel, BorderLayout.CENTER);
 		participantPanel.setLayout(new GridLayout(1, 0, 0, 0));
 		Map<String, Path> tmp = peh.generateListFromFile(csvFile);
 		participantPanel = peh.generateParicipants(participantPanel, tmp);
 		participantPanel.generateComponents();
+		frmTasteOfDowntown.getContentPane().add(participantPanel, BorderLayout.CENTER);
 
 		/*
 		 ************************************************
@@ -269,19 +265,12 @@ public class PassportEntryScreen extends JFrame {
 
 		foodie_combo = new JComboBox<>();
 		foodie_combo.addItem("No Location");
-		
-		for (Component c : participantPanel.getComponents()) {
-			foodie_combo.addItem(((JToggleButton) c).getText());
-		}
-		
-		SortedSet<String> res_names = new TreeSet<String>(tmp.keySet());
-		Iterator<String> it = res_names.iterator();
-		while (it.hasNext()) {
-			foodie_combo.addItem(it.next());
-			Restaurant<String, Integer, Double> r = new Restaurant<String, Integer, Double>(it.next());
+		for (String s : participantPanel.getComponentNames()) {
+			foodie_combo.addItem(s);
+			Restaurant<String, Integer, Double> r = new Restaurant<String, Integer, Double>(s);
 			peh.addRestaurant(r);
 		}
-
+		
 		top.add(foodie_combo, "8, 6, fill, default");
 
 		JPanel bot = new JPanel();
