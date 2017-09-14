@@ -11,12 +11,12 @@ public class Restaurant<L, M, R> extends Triple<String, Integer, Double> {
 	private String name;
 	private int count;
 	private double percent;
-	
+
 	public Restaurant(String name) {
 		super();
 		this.name = name;
 		this.count = 0;
-		this.percent = 0.0;
+		this.percent = 100.0;
 	}
 
 	public Restaurant() {
@@ -37,16 +37,26 @@ public class Restaurant<L, M, R> extends Triple<String, Integer, Double> {
 	public Double getRight() {
 		return percent;
 	}
-	
-	public void incrementCount(){
+
+	public void incrementCount() {
 		this.count++;
 	}
-	
-	public void recalculatePercent(int total){
-		if(total != 0)
-			this.percent = (double) Math.round(this.count * 100.0)  / total;
+
+	public void recalculatePercent(int total) {
+		if (total != 0)
+			this.percent = (double) Math.round(this.count * 100.0) / total;
 		else
 			this.percent = 100.00;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Restaurant [name=" + name + ", count=" + count + ", percent=" + percent + "]";
+	}
+
+	public boolean equals(Restaurant<String, Integer, Double> obj) {
+
+		return this.name.equals(obj.getLeft());
+	}
+
 }

@@ -12,6 +12,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -22,10 +24,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
@@ -38,12 +42,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
+import org.apache.xmlbeans.impl.jam.JComment;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -54,7 +64,6 @@ import com.jgoodies.forms.layout.RowSpec;
 import Helper.BallotsToFile;
 import Helper.PassportEntryHelper;
 import Objects.Passport.Comment;
-import Objects.Restaurant;
 
 public class PassportEntryScreen extends JFrame {
 
@@ -66,10 +75,10 @@ public class PassportEntryScreen extends JFrame {
 	private JFrame frmTasteOfDowntown;
 	private JTextField age_field, postal_field;
 	private JTextArea comments_area;
-	private JComboBox<String> gender_combo, foodie_combo ;
+	private JComboBox<String> gender_combo, foodie_combo;
 
 	private ToggleButtonPanel participantPanel;
-	
+
 	private File csvFile;
 	private static PassportEntryHelper peh;
 	private static BallotsToFile btf;
@@ -96,7 +105,7 @@ public class PassportEntryScreen extends JFrame {
 	 */
 	public PassportEntryScreen() {
 		getFile();
-		peh = PassportEntryHelper.getInstance();;
+		peh = PassportEntryHelper.getInstance();
 		btf = new BallotsToFile();
 		btf.createFile();
 		initialize();
@@ -180,6 +189,7 @@ public class PassportEntryScreen extends JFrame {
 		Map<String, Path> tmp = peh.generateListFromFile(csvFile);
 		participantPanel = peh.generateParicipants(participantPanel, tmp);
 		participantPanel.generateComponents();
+		participantPanel.setToggles(peh.getMasterResList());
 		frmTasteOfDowntown.getContentPane().add(participantPanel, BorderLayout.CENTER);
 
 		/*
@@ -240,6 +250,22 @@ public class PassportEntryScreen extends JFrame {
 		comments_area.setTabSize(4);
 		comments_area.setLineWrap(true);
 		comments_area.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		comments_area.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_TAB) {
+					if(e.getModifiers() > 0) {
+						comments_area.transferFocusBackward();
+					}else {
+						comments_area.transferFocus();
+					}
+					e.consume();
+				}
+			}
+			
+		});
+		
 		scrollPane.setViewportView(comments_area);
 
 		JLabel lblGender = new JLabel("Gender");
@@ -251,12 +277,14 @@ public class PassportEntryScreen extends JFrame {
 		gender_combo.setMaximumRowCount(3);
 		top.add(gender_combo, "4, 4, fill, default");
 
-		
 		JLabel lblPostalCode = new JLabel("Postal Code");
 		lblPostalCode.setHorizontalAlignment(SwingConstants.RIGHT);
 		top.add(lblPostalCode, "2, 6, right, default");
 
 		postal_field = new JTextField();
+		DocumentFilter filter = new UppercaseDocumentFilter();
+		((AbstractDocument) postal_field.getDocument()).setDocumentFilter(filter);
+		
 		top.add(postal_field, "4, 6, left, default");
 		postal_field.setColumns(3);
 
@@ -265,12 +293,11 @@ public class PassportEntryScreen extends JFrame {
 
 		foodie_combo = new JComboBox<>();
 		foodie_combo.addItem("No Location");
+
 		for (String s : participantPanel.getComponentNames()) {
 			foodie_combo.addItem(s);
-			Restaurant<String, Integer, Double> r = new Restaurant<String, Integer, Double>(s);
-			peh.addRestaurant(r);
 		}
-		
+
 		top.add(foodie_combo, "8, 6, fill, default");
 
 		JPanel bot = new JPanel();
@@ -299,19 +326,10 @@ public class PassportEntryScreen extends JFrame {
 					Comment<String, String> comments = comments_area.getText() != null
 							? new Comment<String, String>(comments_area.getText(), "General")
 							: new Comment<String, String>("No Comment", "No Comment");
-					
-					peh.enterBallot(age, gender, postal, comments, foodie);
+
 					List<String> res = participantPanel.selectedToggles();
-					
-					for(String s : res){
-						if(peh.contains(s)){
-							Restaurant<String, Integer, Double> r = peh.getRestaurant(s);
-							r.incrementCount();
-							r.recalculatePercent(++peh.TOTAL_TALLY);
-							peh.updateRestaurant(r);
-						}				
-					}			
-					
+
+					peh.enterBallot(age, gender, postal, comments, foodie, res);
 					resetScreen();
 				} else {
 					JOptionPane.showMessageDialog(null,
@@ -319,6 +337,29 @@ public class PassportEntryScreen extends JFrame {
 				}
 			}
 		});
+		
+		AbstractAction action = new AbstractAction() {
+			
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(e.getSource() instanceof JButton) {
+					JButton btn = new JButton();
+					btn.doClick();
+				}else if(e.getSource() instanceof JComment) {
+					JComponent com = (JComponent) e.getSource();
+					com.transferFocus();
+				}
+				
+			}
+		}; 
+		
+		enter_button.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0), "DoClick");
+		enter_button.getActionMap().put("DoClick", action);
 
 		JButton finish_button = new JButton("Finish");
 		finish_button.setToolTipText(
@@ -439,8 +480,24 @@ public class PassportEntryScreen extends JFrame {
 	public void resetScreen() {
 		age_field.setText("");
 		postal_field.setText("");
-		gender_combo.setSelectedItem(Integer.valueOf(0));
-		foodie_combo.setSelectedItem(Integer.valueOf(0));
+		gender_combo.setSelectedIndex(0);
+		foodie_combo.setSelectedIndex(0);
+		comments_area.setText("");
 		participantPanel.setToggles(peh.getMasterResList());
+		age_field.requestFocus();
+	}
+}
+
+class UppercaseDocumentFilter extends DocumentFilter {
+	public void insertString(DocumentFilter.FilterBypass fb, int offset, String text, AttributeSet attr)
+			throws BadLocationException {
+
+		fb.insertString(offset, text.toUpperCase(), attr);
+	}
+
+	public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+			throws BadLocationException {
+
+		fb.replace(offset, length, text.toUpperCase(), attrs);
 	}
 }

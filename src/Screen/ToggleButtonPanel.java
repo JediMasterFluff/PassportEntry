@@ -1,14 +1,17 @@
 package Screen;
 
 import java.awt.Component;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-import Helper.P_Log;
 import Objects.Restaurant;
 
 public class ToggleButtonPanel extends JPanel {
@@ -24,15 +27,15 @@ public class ToggleButtonPanel extends JPanel {
 	}
 
 	public void generateComponents() {
-		components = getComponents();		
+		components = getComponents();
 	}
-	
-	public String[] getComponentNames() {
-		String[] list = new String[this.components.length];
-		
-		for(int i = 1; i < this.components.length; i++) {
+
+	public SortedSet<String> getComponentNames() {
+		SortedSet<String> list = new TreeSet<String>();
+
+		for (int i = 0; i < this.components.length; i++) {
 			Component c = this.components[i];
-			list[i] = ((JToggleButton) c).getText();
+			list.add(((JToggleButton) c).getText());
 		}
 
 		return list;
@@ -50,28 +53,32 @@ public class ToggleButtonPanel extends JPanel {
 		}
 		return names;
 	}
-
-	public void setToggles(Vector<Restaurant<String, Integer, Double>> percentages){
-		for (int i = 1; i < components.length; i++){
-			P_Log log = P_Log.getLog();
+	
+	public void setToggles(Map<Integer, Restaurant<String, Integer, Double>> percentages) {
+		for (int i = 0; i < components.length; i++) {
 			Component c = components[i];
-			log.writeLog("Component " + i + " - " + ((JToggleButton) c).getText() , Level.INFO);
-			for(int j = 1; j < percentages.size(); j++) {
-				if(((JToggleButton) c).getText().equals(percentages.get(j).getLeft())) {
-					
-					Restaurant<String, Integer, Double> res = percentages.get(j);
+			for (Entry<Integer, Restaurant<String, Integer, Double>> e : percentages.entrySet()) {
+				Restaurant<String, Integer, Double> res = e.getValue();
+				if (((JToggleButton) c).getText() == res.getLeft()) {
 
-					if(res.getRight() >= 80.00){
+					if (res.getRight() >= 80.00) {
 						if (c instanceof JToggleButton)
-							((JToggleButton) c).setSelected(true);;
-					}
-					else {
+							((JToggleButton) c).setSelected(true);
+
+					} else {
 						if (c instanceof JToggleButton)
-							((JToggleButton) c).setSelected(false);;
+							((JToggleButton) c).setSelected(false);
+
 					}
-						
+
 				}
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "ToggleButtonPanel [components=" + Arrays.toString(components) + "]";
+	}
+
 }

@@ -10,12 +10,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -33,22 +34,20 @@ public class PassportEntryHelper {
 	private static final int GAP = 5;
 	private static PassportEntryHelper instance = null;
 
-	private Vector<Restaurant<String, Integer, Double>> MasterResList;
-	private Vector<Passport> MasterBallotList;
+	private Map<Integer, Restaurant<String, Integer, Double>> MasterResList;
+	private ArrayList<Passport> MasterBallotList;
 	private Passport current_passport;
-	public int TOTAL_TALLY;
 
 	protected PassportEntryHelper() {
-		TOTAL_TALLY = 0;
-		MasterResList = new Vector<Restaurant<String, Integer, Double>>();
-		MasterBallotList = new Vector<Passport>();
+		MasterResList = new LinkedHashMap<Integer, Restaurant<String, Integer, Double>>();
+		MasterBallotList = new ArrayList<Passport>();
 		current_passport = new Passport();
 	}
-	
+
 	public static PassportEntryHelper getInstance() {
-		if(instance == null)
+		if (instance == null)
 			instance = new PassportEntryHelper();
-		
+
 		return instance;
 	}
 
@@ -124,6 +123,10 @@ public class PassportEntryHelper {
 				if (it.hasNext()) {
 					Map.Entry<String, Path> pair = it.next();
 					tBtn = new JToggleButton(pair.getKey());
+
+					Restaurant<String, Integer, Double> res = new Restaurant<String, Integer, Double>(pair.getKey());
+					addRestaurant(res);
+
 					BufferedImage image = null;
 					try {
 						image = ImageIO.read(pair.getValue().toFile());
@@ -142,6 +145,8 @@ public class PassportEntryHelper {
 		}
 
 		parent.setPreferredSize(new Dimension(parent.getWidth(), parent.getHeight()));
+
+		// printRestaurants();
 
 		return parent;
 	}
@@ -165,16 +170,24 @@ public class PassportEntryHelper {
 	 * @param foodie
 	 *            The users foodie vote
 	 */
-	public void enterBallot(String age, String gender, String postal, Comment<String, String> comments, String foodie) {
+	public void enterBallot(String age, String gender, String postal, Comment<String, String> comments, String foodie,
+			List<String> res) {
 
 		current_passport.setAge(age);
 		current_passport.setComments(comments);
 		current_passport.setFoodie(foodie);
 		current_passport.setGender(gender);
-		
-		MasterBallotList.addElement(current_passport);
-		
+
+		for (String s : res) {
+			Restaurant<String, Integer, Double> r = getRestaurant(s);
+			r.incrementCount();
+			updateRestaurant(r);
+		}
+
+		MasterBallotList.add(current_passport);
 		RecalculatePercentage();
+		printRestaurants();
+		printBallotList();
 		current_passport = new Passport();
 	}
 
@@ -188,65 +201,82 @@ public class PassportEntryHelper {
 
 	}
 
-	public void addRestaurant(Restaurant<String, Integer, Double> r) {
-		if (!MasterResList.contains(r))
-			MasterResList.add(r);
-	}
-
 	/**
-	 * Method to check the MasterResList if the given restaurant name is already is the list
-	 * @param s The name of the Restaurant to test
-	 * @return true if name is in the list. false if name is not in the list.
+	 * Adds a Restaurant to the MasterResList, if doesn't already exist
+	 * 
+	 * @param r
+	 *            Restaurant to add
 	 */
-	public boolean contains(String s) {
-		for (Restaurant<String, Integer, Double> r : MasterResList) {
-			if (r.getLeft() == s)
-				return true;
-		}
-		return false;
+	private void addRestaurant(Restaurant<String, Integer, Double> r) {
+		if (!MasterResList.containsValue(r))
+			MasterResList.put(MasterResList.size() + 1, r);
 	}
 
 	/**
 	 * Returns a Restaurant Object from a given name, if it exists
-	 * @param name The name of the restaurant to return
+	 * 
+	 * @param name
+	 *            The name of the restaurant to return
 	 * @return The restaurant object returned from the MasterReslist
 	 */
 	public Restaurant<String, Integer, Double> getRestaurant(String name) {
-		Iterator<Restaurant<String, Integer, Double>> it = MasterResList.iterator();
-		while (it.hasNext()) {
-			if (contains(name))
-				return it.next();
+
+		for (Entry<Integer, Restaurant<String, Integer, Double>> e : MasterResList.entrySet()) {
+			if (e.getValue().getLeft().equals(name))
+				return e.getValue();
 		}
 		return null;
+
 	}
 
 	public int getMasterBallotSize() {
 		return MasterBallotList.size();
 	}
 
+	/**
+	 * Will update the given Restaurant in the MasterResList of the application
+	 * 
+	 * @param r
+	 *            The restaurant to update in the list
+	 */
 	public void updateRestaurant(Restaurant<String, Integer, Double> r) {
-		for (Restaurant<String, Integer, Double> tmp : MasterResList) {
-			if (tmp.getLeft().equals(r.getLeft())) {
-				MasterResList.remove(tmp);
-				MasterResList.add(r);
+		for (Entry<Integer, Restaurant<String, Integer, Double>> e : MasterResList.entrySet()) {
+			if (r.equals(e.getValue())) {
+				e.setValue(r);
 				return;
 			}
 		}
 	}
-	
-	
+
 	/**
 	 * Internal method called after every ballot has been entered.
 	 * 
 	 * Will recalculate every restaurant's voting percentage in the MasterResList
 	 */
 	private void RecalculatePercentage() {
-		for(Restaurant<String, Integer, Double> res : MasterResList) {
-			res.recalculatePercent(TOTAL_TALLY);
+		for (Restaurant<String, Integer, Double> res : MasterResList.values()) {
+			res.recalculatePercent(MasterBallotList.size());
 		}
 	}
 
-	public Vector<Restaurant<String, Integer, Double>> getMasterResList() {
+	public Map<Integer, Restaurant<String, Integer, Double>> getMasterResList() {
 		return MasterResList;
+	}
+
+	private void printRestaurants() {
+		System.out.println("***** PRINTING RESTAURANTS *****");
+		for (Entry<Integer, Restaurant<String, Integer, Double>> e : MasterResList.entrySet()) {
+			int k = e.getKey();
+			Restaurant<String, Integer, Double> res = e.getValue();
+
+			System.out.println("Item " + k + " " + res.toString());
+		}
+	}
+
+	private void printBallotList() {
+		System.out.println("***** PRINTING " + MasterBallotList.size() + " ENTERED BALLOTS *****");
+		for (Passport pass : MasterBallotList) {
+			System.out.println(pass.toString());
+		}
 	}
 }

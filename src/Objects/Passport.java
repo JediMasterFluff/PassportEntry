@@ -85,4 +85,10 @@ public class Passport {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "Passport [foodie=" + foodie + ", age=" + age + ", postal=" + postal + ", gender=" + gender
+				+ ", comments=" + comments.getText() + "]";
+	}
+
 }
