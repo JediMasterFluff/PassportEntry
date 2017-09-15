@@ -5,11 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -27,7 +27,6 @@ import Objects.Restaurant;
  * restaurant from all passed passports.
  * 
  * @author Data
- *
  */
 public class BallotsToFile {
 
@@ -49,9 +48,8 @@ public class BallotsToFile {
 
 	/**
 	 * Creates the working Passport Entry workbook for all the processing of the
-	 * current session.
-	 * 
-	 * The file will remain open until the finish() method is called.
+	 * current session. The file will remain open until the finish() method is
+	 * called.
 	 */
 	public void createFile() {
 
@@ -85,10 +83,9 @@ public class BallotsToFile {
 	/**
 	 * Method to insert ballots into the final file
 	 * 
-	 * @param pass
-	 *            A vector of Passports to enter
+	 * @param pass A vector of Passports to enter
 	 */
-	public void writeBallots(Vector<Passport> pass) {
+	public void writeBallots(ArrayList<Passport> pass) {
 
 		XSSFSheet sheet = workbook.getSheet("Passport Counts");
 		int colNum;
@@ -107,12 +104,9 @@ public class BallotsToFile {
 	/**
 	 * Helper method to enter a ballot entry into the file
 	 * 
-	 * @param r
-	 *            the current row being inserted into
-	 * @param col
-	 *            the column number of the current row being inserted into
-	 * @param value
-	 *            the value you want to insert
+	 * @param r the current row being inserted into
+	 * @param col the column number of the current row being inserted into
+	 * @param value the value you want to insert
 	 */
 	private void enterValue(Row r, int col, String value) {
 		Cell c = r.createCell(col);
@@ -123,8 +117,7 @@ public class BallotsToFile {
 	 * Pulls the vote map from a an already given Passport and either adds a new
 	 * entry to the master map or appends their tallies to an existing entry
 	 * 
-	 * @param votes
-	 *            The LinkedHashMap of votes from a Passport
+	 * @param votes The LinkedHashMap of votes from a Passport
 	 */
 	@SuppressWarnings("unused")
 	private void getResturantVotes(LinkedHashMap<Restaurant<String, Integer, Double>, Integer> votes) {

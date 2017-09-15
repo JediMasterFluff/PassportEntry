@@ -58,8 +58,7 @@ public class PassportEntryHelper {
 	 * Will create a String array of restaurant names provided by the user via a CSV
 	 * file
 	 * 
-	 * @param f
-	 *            - a CSV file given at the start of the application to be used to
+	 * @param f A CSV file given at the start of the application to be used to
 	 *            generate the toggle button grid
 	 * @return a new ArrayList of restaurant names
 	 */
@@ -91,10 +90,8 @@ public class PassportEntryHelper {
 	 * restaurants Places toggle buttons will be placed into the provided JFrame and
 	 * will be returned.
 	 * 
-	 * @param parent
-	 *            the JPanel to place the grid of toggle buttons
-	 * @param map
-	 *            and ArrayList of String names of the restaurants
+	 * @param parent the JPanel to place the grid of toggle buttons
+	 * @param map and ArrayList of String names of the restaurants
 	 * @return the JPanel given but with a grid of toggle buttons
 	 */
 	public ToggleButtonPanel generateParicipants(ToggleButtonPanel parent, Map<String, Path> map) {
@@ -154,21 +151,14 @@ public class PassportEntryHelper {
 	/**
 	 * All information entered on the screen will be saved to the current passport
 	 * object and then will be placed into the master ballot list before creating a
-	 * new passport object
+	 * new passport object Every time a ballot is submitted, we will recalculate the
+	 * voting percentage records
 	 * 
-	 * Every time a ballot is submitted, we will recalculate the voting percentage
-	 * records
-	 * 
-	 * @param age
-	 *            The age entered on the ballot
-	 * @param gender
-	 *            The provided gender on the ballot
-	 * @param postal
-	 *            The provided postal code on the ballot
-	 * @param comments
-	 *            The optional comments on the ballot
-	 * @param foodie
-	 *            The users foodie vote
+	 * @param age The age entered on the ballot
+	 * @param gender The provided gender on the ballot
+	 * @param postal The provided postal code on the ballot
+	 * @param comments The optional comments on the ballot
+	 * @param foodie The users foodie vote
 	 */
 	public void enterBallot(String age, String gender, String postal, Comment<String, String> comments, String foodie,
 			List<String> res) {
@@ -193,9 +183,8 @@ public class PassportEntryHelper {
 
 	/**
 	 * Will write the current contents of the MasterBallotList to a file, then clear
-	 * the list.
-	 * 
-	 * Should only be called at the end of processing ballots. Cannot be undone
+	 * the list. Should only be called at the end of processing ballots. Cannot be
+	 * undone
 	 */
 	public void submitCountedBallots() {
 
@@ -204,8 +193,7 @@ public class PassportEntryHelper {
 	/**
 	 * Adds a Restaurant to the MasterResList, if doesn't already exist
 	 * 
-	 * @param r
-	 *            Restaurant to add
+	 * @param r Restaurant to add
 	 */
 	private void addRestaurant(Restaurant<String, Integer, Double> r) {
 		if (!MasterResList.containsValue(r))
@@ -215,8 +203,7 @@ public class PassportEntryHelper {
 	/**
 	 * Returns a Restaurant Object from a given name, if it exists
 	 * 
-	 * @param name
-	 *            The name of the restaurant to return
+	 * @param name The name of the restaurant to return
 	 * @return The restaurant object returned from the MasterReslist
 	 */
 	public Restaurant<String, Integer, Double> getRestaurant(String name) {
@@ -236,8 +223,7 @@ public class PassportEntryHelper {
 	/**
 	 * Will update the given Restaurant in the MasterResList of the application
 	 * 
-	 * @param r
-	 *            The restaurant to update in the list
+	 * @param r The restaurant to update in the list
 	 */
 	public void updateRestaurant(Restaurant<String, Integer, Double> r) {
 		for (Entry<Integer, Restaurant<String, Integer, Double>> e : MasterResList.entrySet()) {
@@ -249,9 +235,8 @@ public class PassportEntryHelper {
 	}
 
 	/**
-	 * Internal method called after every ballot has been entered.
-	 * 
-	 * Will recalculate every restaurant's voting percentage in the MasterResList
+	 * Internal method called after every ballot has been entered. Will recalculate
+	 * every restaurant's voting percentage in the MasterResList
 	 */
 	private void RecalculatePercentage() {
 		for (Restaurant<String, Integer, Double> res : MasterResList.values()) {

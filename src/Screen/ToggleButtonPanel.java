@@ -53,7 +53,7 @@ public class ToggleButtonPanel extends JPanel {
 		}
 		return names;
 	}
-	
+
 	public void setToggles(Map<Integer, Restaurant<String, Integer, Double>> percentages) {
 		for (int i = 0; i < components.length; i++) {
 			Component c = components[i];

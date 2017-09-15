@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
  * This Class will handle all operations that are to be done to an image.
  *
  * @author Christian
- *
  */
 public class ImageHelper {
 

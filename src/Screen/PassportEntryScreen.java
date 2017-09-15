@@ -178,9 +178,7 @@ public class PassportEntryScreen extends JFrame {
 		}
 
 		/*
-		 ************************************************
-		 * PARTICIPANT PANEL *
-		 ************************************************
+		 ************************************************ PARTICIPANT PANEL *
 		 */
 
 		participantPanel = new ToggleButtonPanel();
@@ -193,9 +191,7 @@ public class PassportEntryScreen extends JFrame {
 		frmTasteOfDowntown.getContentPane().add(participantPanel, BorderLayout.CENTER);
 
 		/*
-		 ************************************************
-		 * BOTTOM PANEL *
-		 ************************************************
+		 ************************************************ BOTTOM PANEL *
 		 */
 
 		JPanel bottomPanel = new JPanel();
@@ -254,18 +250,18 @@ public class PassportEntryScreen extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_TAB) {
-					if(e.getModifiers() > 0) {
+				if (e.getKeyCode() == KeyEvent.VK_TAB) {
+					if (e.getModifiers() > 0) {
 						comments_area.transferFocusBackward();
-					}else {
+					} else {
 						comments_area.transferFocus();
 					}
 					e.consume();
 				}
 			}
-			
+
 		});
-		
+
 		scrollPane.setViewportView(comments_area);
 
 		JLabel lblGender = new JLabel("Gender");
@@ -284,7 +280,7 @@ public class PassportEntryScreen extends JFrame {
 		postal_field = new JTextField();
 		DocumentFilter filter = new UppercaseDocumentFilter();
 		((AbstractDocument) postal_field.getDocument()).setDocumentFilter(filter);
-		
+
 		top.add(postal_field, "4, 6, left, default");
 		postal_field.setColumns(3);
 
@@ -337,9 +333,9 @@ public class PassportEntryScreen extends JFrame {
 				}
 			}
 		});
-		
+
 		AbstractAction action = new AbstractAction() {
-			
+
 			/**
 			 * 
 			 */
@@ -347,18 +343,18 @@ public class PassportEntryScreen extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(e.getSource() instanceof JButton) {
+				if (e.getSource() instanceof JButton) {
 					JButton btn = new JButton();
 					btn.doClick();
-				}else if(e.getSource() instanceof JComment) {
+				} else if (e.getSource() instanceof JComment) {
 					JComponent com = (JComponent) e.getSource();
 					com.transferFocus();
 				}
-				
+
 			}
-		}; 
-		
-		enter_button.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0), "DoClick");
+		};
+
+		enter_button.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "DoClick");
 		enter_button.getActionMap().put("DoClick", action);
 
 		JButton finish_button = new JButton("Finish");
