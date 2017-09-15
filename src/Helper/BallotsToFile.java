@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -30,13 +29,13 @@ import Objects.Restaurant;
  */
 public class BallotsToFile {
 
-	private LinkedHashMap<Restaurant<String, Integer, Double>, Integer> map; // Map to hold all passed passport
-																				// restaurant votes
-
 	private static final String FILE_NAME = "/output/BalloutCounts_"
 			+ new SimpleDateFormat("dd_MM_yyyy").format(new Date()) + ".xlsx";
 	private File file;
 	private XSSFWorkbook workbook;
+	private XSSFSheet passport_sheet;
+	private XSSFSheet comments_sheet;
+	private XSSFSheet restaurant_sheet;
 
 	private int rowNum; // The running count of the number of rows entered into the current workbook
 
@@ -44,6 +43,7 @@ public class BallotsToFile {
 
 		file = new File(FILE_NAME);
 		workbook = new XSSFWorkbook();
+		inializeWorkbook();
 	}
 
 	/**
@@ -51,9 +51,11 @@ public class BallotsToFile {
 	 * current session. The file will remain open until the finish() method is
 	 * called.
 	 */
-	public void createFile() {
+	private void inializeWorkbook() {
 
-		XSSFSheet passport_sheet = workbook.createSheet("Passport Counts");
+		passport_sheet = workbook.createSheet("Passport Counts");
+		comments_sheet = workbook.createSheet("Comments");
+		restaurant_sheet = workbook.createSheet("Restaurant Tally");
 
 		Object[][] passports = { { "Age", "Gender", "Postal Code", "Foodie Vote" } };
 		rowNum = 0;
@@ -69,6 +71,47 @@ public class BallotsToFile {
 					cell.setCellValue((Integer) field);
 			}
 
+		}
+
+		Row comment_row = comments_sheet.createRow(0);
+		Cell c = comment_row.createCell(0);
+		c.setCellValue("Comment");
+
+		Row restaurant_row = restaurant_sheet.createRow(0);
+		Cell c1 = restaurant_row.createCell(0);
+		Cell c2 = restaurant_row.createCell(1);
+		Cell c3 = restaurant_row.createCell(2);
+
+		c1.setCellValue("Name");
+		c2.setCellValue("Votes");
+		c3.setCellValue("Voting Percentage");
+		
+		try {
+			FileOutputStream fos = new FileOutputStream(file);
+			workbook.write(fos);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	/**
+	 * Method to insert ballots into the final file
+	 * 
+	 * @param pass An ArrayList of Passports to enter into the file
+	 */
+	public void writeBallots(ArrayList<Passport> pass) {
+
+		for (Passport p : pass) {
+			enterValue(passport_sheet, rowNum, 0, p.getAge());
+			enterValue(passport_sheet, rowNum, 1, p.getGender());
+			enterValue(passport_sheet, rowNum, 2, p.getPostal());
+			enterValue(passport_sheet, rowNum, 3, p.getFoodie());
+
+			enterValue(comments_sheet, rowNum, 0, p.getComments().getText());
+
+			rowNum++;
 			try {
 				FileOutputStream fos = new FileOutputStream(file);
 				workbook.write(fos);
@@ -78,67 +121,51 @@ public class BallotsToFile {
 				e1.printStackTrace();
 			}
 		}
+
 	}
 
 	/**
-	 * Method to insert ballots into the final file
+	 * Method to insert the total restaurant tallies to the file
 	 * 
-	 * @param pass A vector of Passports to enter
+	 * @param restaurants A map of the current Restaurant Count
 	 */
-	public void writeBallots(ArrayList<Passport> pass) {
+	public void writeRestaurantTally(Map<Integer, Restaurant<String, Integer, Double>> restaurants) {
+		for (Entry<Integer, Restaurant<String, Integer, Double>> e : restaurants.entrySet()) {
+			int row = e.getKey();
+			Restaurant<String, Integer, Double> r = e.getValue();
+			enterValue(restaurant_sheet, row, 0, r.getLeft());
+			enterValue(restaurant_sheet, row, 1, r.getMiddle().toString());
+			enterValue(restaurant_sheet, row, 2, r.getRight().toString());
 
-		XSSFSheet sheet = workbook.getSheet("Passport Counts");
-		int colNum;
-		for (Passport p : pass) {
-			colNum = 0;
-			Row row = sheet.createRow(rowNum++);
-
-			enterValue(row, colNum++, p.getAge());
-			enterValue(row, colNum++, p.getGender());
-			enterValue(row, colNum++, p.getPostal());
-			enterValue(row, colNum++, p.getFoodie());
-
+			try {
+				FileOutputStream fos = new FileOutputStream(file);
+				workbook.write(fos);
+			} catch (FileNotFoundException e0) {
+				e0.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
 		}
 	}
 
 	/**
-	 * Helper method to enter a ballot entry into the file
+	 * Internal helper method to enter a value entry into the file
 	 * 
-	 * @param r the current row being inserted into
-	 * @param col the column number of the current row being inserted into
-	 * @param value the value you want to insert
+	 * @param sheet The workbook sheet you want to place the entry
+	 * @param rowNum The row to insert into
+	 * @param col The column to insert into
+	 * @param value The value to insert
 	 */
-	private void enterValue(Row r, int col, String value) {
+	private void enterValue(XSSFSheet sheet, int rowNum, int col, String value) {
+		Row r = sheet.createRow(rowNum);
 		Cell c = r.createCell(col);
 		c.setCellValue(value);
 	}
 
 	/**
-	 * Pulls the vote map from a an already given Passport and either adds a new
-	 * entry to the master map or appends their tallies to an existing entry
-	 * 
-	 * @param votes The LinkedHashMap of votes from a Passport
-	 */
-	@SuppressWarnings("unused")
-	private void getResturantVotes(LinkedHashMap<Restaurant<String, Integer, Double>, Integer> votes) {
-		if (!votes.isEmpty()) {
-			Iterator<Entry<Restaurant<String, Integer, Double>, Integer>> it = votes.entrySet().iterator();
-			while (it.hasNext()) {
-				Entry<Restaurant<String, Integer, Double>, Integer> e = it.next();
-				if (map.containsKey(e.getKey())) { // Entry exists
-					int val = map.get(e.getKey());
-					val += e.getValue();
-					map.put(e.getKey(), val);
-				} else // Entry not entered
-					map.put(e.getKey(), e.getValue());
-			}
-
-		}
-	}
-
-	/**
-	 * Call to finally close the passport entry workbook. Should only be called once
-	 * all processing has been completed.
+	 * Call to close the passport entry workbook. Should only be called once all
+	 * processing has been completed.
 	 */
 	public void finish() {
 		try {

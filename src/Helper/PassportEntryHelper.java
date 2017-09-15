@@ -164,6 +164,7 @@ public class PassportEntryHelper {
 			List<String> res) {
 
 		current_passport.setAge(age);
+		current_passport.setPostal(postal);
 		current_passport.setComments(comments);
 		current_passport.setFoodie(foodie);
 		current_passport.setGender(gender);
@@ -186,8 +187,12 @@ public class PassportEntryHelper {
 	 * the list. Should only be called at the end of processing ballots. Cannot be
 	 * undone
 	 */
-	public void submitCountedBallots() {
-
+	public void submitCountedBallots(BallotsToFile btf) {
+		btf.writeBallots(MasterBallotList);
+		btf.writeRestaurantTally(MasterResList);
+		
+		MasterBallotList.clear();
+		
 	}
 
 	/**
@@ -244,10 +249,6 @@ public class PassportEntryHelper {
 		}
 	}
 
-	public Map<Integer, Restaurant<String, Integer, Double>> getMasterResList() {
-		return MasterResList;
-	}
-
 	private void printRestaurants() {
 		System.out.println("***** PRINTING RESTAURANTS *****");
 		for (Entry<Integer, Restaurant<String, Integer, Double>> e : MasterResList.entrySet()) {
@@ -264,4 +265,17 @@ public class PassportEntryHelper {
 			System.out.println(pass.toString());
 		}
 	}
+
+	public LinkedHashMap<String, Double> getRestaurantPercentages() {
+		LinkedHashMap<String, Double> lhm = new LinkedHashMap<String, Double>();
+
+		for (Entry<Integer, Restaurant<String, Integer, Double>> e : MasterResList.entrySet()) {
+			Restaurant<String, Integer, Double> r = e.getValue();
+
+			lhm.put(r.getLeft(), r.getRight());
+		}
+
+		return lhm;
+	}
+
 }

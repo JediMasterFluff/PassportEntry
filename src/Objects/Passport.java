@@ -15,7 +15,13 @@ public class Passport {
 	private String gender;
 	private Comment<String, String> comments;
 
+	
 	public Passport() {
+		this.foodie = "No Location";
+		this.age = "BLANK";
+		this.postal = "BLANK";
+		this.gender = "BLANK";
+		this.comments = new Comment<String, String>("No Comment", "No Comment");
 	}
 
 	public String getFoodie() {

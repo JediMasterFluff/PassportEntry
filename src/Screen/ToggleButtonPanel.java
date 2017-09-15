@@ -2,8 +2,8 @@ package Screen;
 
 import java.awt.Component;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -11,8 +11,6 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
-
-import Objects.Restaurant;
 
 public class ToggleButtonPanel extends JPanel {
 
@@ -54,14 +52,13 @@ public class ToggleButtonPanel extends JPanel {
 		return names;
 	}
 
-	public void setToggles(Map<Integer, Restaurant<String, Integer, Double>> percentages) {
+	public void setToggles(LinkedHashMap<String, Double> percentages) {
 		for (int i = 0; i < components.length; i++) {
 			Component c = components[i];
-			for (Entry<Integer, Restaurant<String, Integer, Double>> e : percentages.entrySet()) {
-				Restaurant<String, Integer, Double> res = e.getValue();
-				if (((JToggleButton) c).getText() == res.getLeft()) {
+			for (Entry<String, Double> e : percentages.entrySet()) {
+				if (((JToggleButton) c).getText() == e.getKey()) {
 
-					if (res.getRight() >= 80.00) {
+					if (e.getValue() >= 75.00) {
 						if (c instanceof JToggleButton)
 							((JToggleButton) c).setSelected(true);
 

@@ -58,5 +58,10 @@ public class Restaurant<L, M, R> extends Triple<String, Integer, Double> {
 
 		return this.name.equals(obj.getLeft());
 	}
+	
+	public void reset() {
+		this.count = 0;
+		this.percent = 0.0;
+	}
 
 }

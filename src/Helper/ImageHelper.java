@@ -2,6 +2,7 @@ package Helper;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 /**
@@ -12,8 +13,8 @@ import java.awt.image.BufferedImage;
 public class ImageHelper {
 
 	public static BufferedImage resize(BufferedImage image, int width, int height) {
-		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
-		Graphics2D g2d = (Graphics2D) bi.createGraphics();
+		BufferedImage bi = new BufferedImage(width, height, Transparency.TRANSLUCENT);
+		Graphics2D g2d = bi.createGraphics();
 		g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
 		g2d.drawImage(image, 0, 0, width, height, null);
 		g2d.dispose();
