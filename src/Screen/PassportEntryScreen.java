@@ -102,8 +102,9 @@ public class PassportEntryScreen extends JFrame {
 
 	/**
 	 * Create the application.
+	 * @throws Exception 
 	 */
-	public PassportEntryScreen() {
+	public PassportEntryScreen() throws Exception {
 		getFile();
 		peh = PassportEntryHelper.getInstance();
 		btf = new BallotsToFile();

@@ -33,6 +33,7 @@ public class PassportEntryHelper {
 
 	private static final int GAP = 5;
 	private static PassportEntryHelper instance = null;
+	private int TOTAL_TALLY;
 
 	private Map<Integer, Restaurant<String, Integer, Double>> MasterResList;
 	private ArrayList<Passport> MasterBallotList;
@@ -42,6 +43,7 @@ public class PassportEntryHelper {
 		MasterResList = new LinkedHashMap<Integer, Restaurant<String, Integer, Double>>();
 		MasterBallotList = new ArrayList<Passport>();
 		current_passport = new Passport();
+		TOTAL_TALLY = 0;
 	}
 
 	public static PassportEntryHelper getInstance() {
@@ -174,7 +176,7 @@ public class PassportEntryHelper {
 			r.incrementCount();
 			updateRestaurant(r);
 		}
-
+		TOTAL_TALLY++;
 		MasterBallotList.add(current_passport);
 		RecalculatePercentage();
 		printRestaurants();
@@ -245,7 +247,7 @@ public class PassportEntryHelper {
 	 */
 	private void RecalculatePercentage() {
 		for (Restaurant<String, Integer, Double> res : MasterResList.values()) {
-			res.recalculatePercent(MasterBallotList.size());
+			res.recalculatePercent(TOTAL_TALLY);
 		}
 	}
 

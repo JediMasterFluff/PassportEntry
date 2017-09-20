@@ -30,7 +30,7 @@ import Objects.Restaurant;
 public class BallotsToFile {
 
 	private static final String FILE_NAME = "/output/BalloutCounts_"
-			+ new SimpleDateFormat("dd_MM_yyyy").format(new Date()) + ".xlsx";
+			+ new SimpleDateFormat("dd_mm_yyyy_hhmm").format(new Date()) + ".xlsx";
 	private File file;
 	private XSSFWorkbook workbook;
 	private XSSFSheet passport_sheet;
@@ -39,7 +39,7 @@ public class BallotsToFile {
 
 	private int rowNum; // The running count of the number of rows entered into the current workbook
 
-	public BallotsToFile() {
+	public BallotsToFile() throws Exception {
 
 		file = new File(FILE_NAME);
 		workbook = new XSSFWorkbook();
@@ -85,7 +85,7 @@ public class BallotsToFile {
 		c1.setCellValue("Name");
 		c2.setCellValue("Votes");
 		c3.setCellValue("Voting Percentage");
-		
+
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
 			workbook.write(fos);
@@ -104,12 +104,15 @@ public class BallotsToFile {
 	public void writeBallots(ArrayList<Passport> pass) {
 
 		for (Passport p : pass) {
-			enterValue(passport_sheet, rowNum, 0, p.getAge());
-			enterValue(passport_sheet, rowNum, 1, p.getGender());
-			enterValue(passport_sheet, rowNum, 2, p.getPostal());
-			enterValue(passport_sheet, rowNum, 3, p.getFoodie());
+			Row pass_row = passport_sheet.createRow(rowNum);
+			
+			pass_row.createCell(0).setCellValue(p.getAge());
+			pass_row.createCell(1).setCellValue(p.getGender());
+			pass_row.createCell(2).setCellValue(p.getPostal());
+			pass_row.createCell(3).setCellValue(p.getFoodie());
 
-			enterValue(comments_sheet, rowNum, 0, p.getComments().getText());
+			Row com_row = comments_sheet.createRow(rowNum);
+			com_row.createCell(0).setCellValue(p.getComments().getText());
 
 			rowNum++;
 			try {
@@ -131,11 +134,12 @@ public class BallotsToFile {
 	 */
 	public void writeRestaurantTally(Map<Integer, Restaurant<String, Integer, Double>> restaurants) {
 		for (Entry<Integer, Restaurant<String, Integer, Double>> e : restaurants.entrySet()) {
-			int row = e.getKey();
-			Restaurant<String, Integer, Double> r = e.getValue();
-			enterValue(restaurant_sheet, row, 0, r.getLeft());
-			enterValue(restaurant_sheet, row, 1, r.getMiddle().toString());
-			enterValue(restaurant_sheet, row, 2, r.getRight().toString());
+			int rowNum = e.getKey();
+			Restaurant<String, Integer, Double> res = e.getValue();
+			Row r = restaurant_sheet.createRow(rowNum);
+			r.createCell(0).setCellValue(res.getLeft());
+			r.createCell(1).setCellValue(res.getMiddle());
+			r.createCell(2).setCellValue(res.getRight());
 
 			try {
 				FileOutputStream fos = new FileOutputStream(file);
@@ -145,22 +149,8 @@ public class BallotsToFile {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			
-		}
-	}
 
-	/**
-	 * Internal helper method to enter a value entry into the file
-	 * 
-	 * @param sheet The workbook sheet you want to place the entry
-	 * @param rowNum The row to insert into
-	 * @param col The column to insert into
-	 * @param value The value to insert
-	 */
-	private void enterValue(XSSFSheet sheet, int rowNum, int col, String value) {
-		Row r = sheet.createRow(rowNum);
-		Cell c = r.createCell(col);
-		c.setCellValue(value);
+		}
 	}
 
 	/**
